@@ -4,7 +4,7 @@ const userController = {
   //get all users
   getAllUsers(req, res) {
     User.find()
-      .select('-__v')
+      .select("-__v")
       .then((dbUserData) => {
         res.json(dbUserData);
       })
@@ -13,7 +13,6 @@ const userController = {
         res.status(500).json(err);
       });
   },
-
 
   //get a single user by _id
   getUserById({ params }, res) {
@@ -31,6 +30,16 @@ const userController = {
         }
         res.json(dbUserData);
       })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json(err);
+      });
+  },
+
+  // create a new user
+  createUser({ body }, res) {
+    User.create(body)
+      .then((dbUserData) => res.json(dbUserData))
       .catch((err) => {
         console.log(err);
         res.status(500).json(err);

@@ -38,6 +38,7 @@ const userController = {
 
   // create a new user
   createUser({ body }, res) {
+    console.log("In create method")
     User.create(body)
       .then((dbUserData) => res.json(dbUserData))
       .catch((err) => {
@@ -79,7 +80,7 @@ const userController = {
   addFriend(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.id }, //find user by id
-      { $addToSet: { friends: req.body } }, // add friend to user
+      { $push: { friends: req.params.friendId } }, // add friend to user
       { new: true }
     )
       .then((dbUserData) => {

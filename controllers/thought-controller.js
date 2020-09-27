@@ -75,38 +75,44 @@ const thoughtController = {
   },
 
   // delete thought
-// deleteThought({ params }, res) {
-//     Thought.findOneAndDelete({ _id: params.commentId })
-//       .then(dbThoughtData => {
-//         if (!dbThoughtData) {
-//           return res.status(404).json({ message: 'No thought with this id!' });
-//         }
-//         return User.findOneAndUpdate(
-//           { _id: params.pizzaId },
-//           { $pull: { comments: params.commentId } },
-//           { new: true }
-//         );
-//       })
-//       .then(dbUserData => {
-//         if (!dbUserData) {
-//           res.status(404).json({ message: 'No User found with this id!' });
-//           return;
-//         }
-//         res.json(dbUserData);
-//       })
-//       .catch(err => res.json(err));
-//   },
-deleteThought({ params }, res) {
-    Thought.findOneAndDelete({ _id: params.id })
+  deleteThought(req, res) {
+    Thought.findOneAndRemove({ _id: req.params.id })
       .then((dbThoughtData) => {
         if (!dbThoughtData) {
-          res.status(404).json({ message: "No thought found with this id!" });
-          return;
+          return res.status(404).json({ message: 'No thought with this id!' });
         }
-        res.json("Thought deleted");
+
+        // remove thought id from user's `thoughts` field
+        return User.findOneAndUpdate(
+          { thoughts: req.params.id },
+          { $pull: { thoughts: req.params.id } },
+          { new: true }
+        );
       })
-      .catch((err) => res.status(400).json(err));
+      .then((dbUserData) => {
+        if (!dbUserData) {
+          return res.status(404).json({ message: 'Thought created but no user with this id!' });
+        }
+        res.json({ message: 'Thought successfully deleted!' });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json(err);
+      });
   },
+
+
+// deleteThought({ params }, res) {
+//     Thought.findOneAndDelete({ _id: params.id })
+//       .then((dbThoughtData) => {
+//         if (!dbThoughtData) {
+//           res.status(404).json({ message: "No thought found with this id!" });
+//           return;
+//         }
+//         res.json("Thought deleted");
+//       })
+//       .catch((err) => res.status(400).json(err));
+//   },
 
 };
 
